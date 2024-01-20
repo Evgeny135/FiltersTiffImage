@@ -1,0 +1,9 @@
+{
+  "name" : "filterstiffimage",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "2a6371b01420d8820d158b4707e79931feba27aa",
+  "dependencies" : [ {
+    "name" : "tiff",
+    "version>=" : "4.6.0#1"
+  } ]
+}
