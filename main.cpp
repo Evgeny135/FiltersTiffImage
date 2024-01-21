@@ -44,7 +44,7 @@ int main() {
 
     FiltersImage filtersImage;
 
-    matrix = filtersImage.minimumFilter(9,matrix);
+    matrix = filtersImage.mediumFilter(5,matrix);
 
     uint8_t *scanline = (uint8_t *) _TIFFmalloc(width * sizeof(uint8_t));
 

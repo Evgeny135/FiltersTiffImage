@@ -8,8 +8,8 @@ private:
     Matrix<float> generateGaussKernel(int kernelSize, float sigma);
 public:
     FiltersImage() = default;
-    Matrix<int> gaussianBlur(Matrix<int> input,int kernelSize, float sigma);
-    Matrix<int> mediumFilter(int kernelSize, Matrix<int> input);
+    Matrix<int> gaussianBlur(Matrix<int> input,const int kernelSize, const float sigma);
+    Matrix<int> mediumFilter(const int kernelSize, Matrix<int> input);
 
     Matrix<int> maximumFilter(int kernelSize, Matrix<int> input);
 
