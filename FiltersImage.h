@@ -10,6 +10,10 @@ public:
     FiltersImage() = default;
     Matrix<int> gaussianBlur(Matrix<int> input,int kernelSize, float sigma);
     Matrix<int> mediumFilter(int kernelSize, Matrix<int> input);
+
+    Matrix<int> maximumFilter(int kernelSize, Matrix<int> input);
+
+    Matrix<int> minimumFilter(int kernelSize, Matrix<int> input);
 };
 
 

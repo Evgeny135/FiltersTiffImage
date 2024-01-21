@@ -44,10 +44,7 @@ int main() {
 
     FiltersImage filtersImage;
 
-//    Matrix<float> kernel = filtersImage.generateGaussKernel(21,1.5);
-
-//    matrix = filtersImage.gaussianBlur(kernel,matrix);
-    matrix = filtersImage.mediumFilter(9,matrix);
+    matrix = filtersImage.minimumFilter(9,matrix);
 
     uint8_t *scanline = (uint8_t *) _TIFFmalloc(width * sizeof(uint8_t));
 

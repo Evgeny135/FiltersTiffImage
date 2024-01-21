@@ -86,7 +86,6 @@ Matrix<int> FiltersImage::mediumFilter(int kernelSize, Matrix<int> input) {
                     neighborhood.push_back(input.get(i+k,j+l));
                 }
             }
-
             // Сортируем значения
             std::sort(neighborhood.begin(), neighborhood.end());
 
@@ -94,6 +93,49 @@ Matrix<int> FiltersImage::mediumFilter(int kernelSize, Matrix<int> input) {
             output.set(i,j, neighborhood[kernelSize * kernelSize / 2]);
         }
     }
+    return output;
+}
 
+Matrix<int> FiltersImage::maximumFilter(int kernelSize, Matrix<int> input){
+    Matrix<int> output = copy(input);
+
+    int halfKernel = kernelSize / 2;
+
+    for (int i = halfKernel; i < input.getHeight() - halfKernel; ++i) {
+        for (int j = halfKernel; j < input.getWidth() - halfKernel; ++j) {
+            int maxValue = std::numeric_limits<int>::min();
+
+            // Находим максимальное значение в окрестности пикселя
+            for (int k = -halfKernel; k <= halfKernel; ++k) {
+                for (int l = -halfKernel; l <= halfKernel; ++l) {
+                    maxValue = std::max(maxValue, input.get(i+k,j+l));
+                }
+            }
+
+            output.set(i,j,maxValue);
+        }
+    }
+    return output;
+}
+
+Matrix<int> FiltersImage::minimumFilter(int kernelSize, Matrix<int> input){
+    Matrix<int> output = copy(input);
+
+    int halfKernel = kernelSize / 2;
+
+    for (int i = halfKernel; i < input.getHeight() - halfKernel; ++i) {
+        for (int j = halfKernel; j < input.getWidth() - halfKernel; ++j) {
+            int minValue = std::numeric_limits<int>::max();
+
+            // Находим максимальное значение в окрестности пикселя
+            for (int k = -halfKernel; k <= halfKernel; ++k) {
+                for (int l = -halfKernel; l <= halfKernel; ++l) {
+                    minValue = std::min(minValue, input.get(i + k, j + l));
+                }
+            }
+
+            output.set(i, j, minValue);
+        }
+    }
     return output;
 }
