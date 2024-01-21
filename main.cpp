@@ -1,9 +1,10 @@
 #include <iostream>
 #include <tiffio.h>
-
+#include "Matrix.h"
+#include "FiltersImage.h"
 
 int main() {
-    TIFF *inputTiff = TIFFOpen("C:\\Users\\trish\\Desktop\\lenna.tif", "r");
+    TIFF *inputTiff = TIFFOpen("C:\\Users\\trish\\Desktop\\save.tiff", "r");
     if (!inputTiff) {
         std::cerr << "Error: file not found" << std::endl;
         return 1;
@@ -23,31 +24,44 @@ int main() {
     TIFFSetField(outputTiff, TIFFTAG_IMAGELENGTH, height);
     TIFFSetField(outputTiff, TIFFTAG_BITSPERSAMPLE, 8);
     TIFFSetField(outputTiff, TIFFTAG_SAMPLESPERPIXEL, samplesPerPixel);
-    TIFFSetField(outputTiff, TIFFTAG_PHOTOMETRIC, photoMetric);
+    TIFFSetField(outputTiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
     TIFFSetField(outputTiff, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
 
-    uint16_t *scanlineData = (uint16_t *) _TIFFmalloc(TIFFScanlineSize(inputTiff));
+    Matrix<int> matrix(width, height);
 
-    for (uint32_t row = 0; row < height; row++) {
-        TIFFReadScanline(inputTiff, scanlineData, row);
+    uint8_t *raster = (uint8_t *) _TIFFmalloc(width * height * sizeof(uint8_t));
 
-        uint16_t *outputScanlineData = new uint16_t[width * samplesPerPixel];
-        for (uint32_t col = 0; col < width; col++) {
-            for (uint16_t channel = 0; channel < samplesPerPixel; channel++) {
-                uint16_t sample = scanlineData[col * samplesPerPixel + channel];
-                outputScanlineData[col * samplesPerPixel + channel] = static_cast<uint16_t>(sample);
-
+    if (raster) {
+        for (int row = 0; row < height; row++) {
+            TIFFReadScanline(inputTiff, raster, row, 0);
+            for (int col = 0; col < width; col++) {
+                uint8_t sample = raster[col];
+                matrix.set(row, col, sample);
             }
         }
-
-        TIFFWriteScanline(outputTiff, outputScanlineData, row);
-
-        delete[] outputScanlineData;
+        _TIFFfree(raster);
     }
 
-    _TIFFfree(scanlineData);
+    FiltersImage filtersImage;
+
+//    Matrix<float> kernel = filtersImage.generateGaussKernel(21,1.5);
+
+//    matrix = filtersImage.gaussianBlur(kernel,matrix);
+    matrix = filtersImage.mediumFilter(9,matrix);
+
+    uint8_t *scanline = (uint8_t *) _TIFFmalloc(width * sizeof(uint8_t));
+
+    for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            scanline[col] = matrix.get(row, col);
+        }
+
+        if (TIFFWriteScanline(outputTiff, scanline, row) < 0) {
+            break;
+        }
+    }
+
     TIFFClose(inputTiff);
     TIFFClose(outputTiff);
 
-    return 0;
 }
