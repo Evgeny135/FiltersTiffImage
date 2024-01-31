@@ -3,6 +3,7 @@
 #include "Matrix.h"
 #include "cmath"
 #include "algorithm"
+#include "iostream"
 
 Matrix<int> copy(Matrix<int> input){
     Matrix<int> output(input.getWidth(),input.getHeight());
@@ -58,7 +59,6 @@ Matrix<int> FiltersImage::gaussianBlur(Matrix<int> input,int kernelSize, float s
                     int imageX = x + l - kCenter;
                     int imageY = y + k - kCenter;
 
-                    // Проверяем, что координаты находятся в пределах изображения
                     if (imageX >= 0 && imageX < input.getWidth() && imageY >= 0 && imageY < input.getHeight()) {
                         sum += input.get(imageY,imageX)*kernel.get(k,l);
                     }
@@ -79,21 +79,46 @@ Matrix<int> FiltersImage::mediumFilter(int kernelSize, Matrix<int> input) {
 
     for (int i = halfKernel; i < input.getHeight() - halfKernel; ++i) {
         for (int j = halfKernel; j < input.getWidth() - halfKernel; ++j) {
-            // Собираем значения из окрестности пикселя
             neighborhood.clear();
             for (int k = -halfKernel; k <= halfKernel; ++k) {
                 for (int l = -halfKernel; l <= halfKernel; ++l) {
                     neighborhood.push_back(input.get(i+k,j+l));
                 }
             }
-            // Сортируем значения
-            std::sort(neighborhood.begin(), neighborhood.end());
 
-            // Присваиваем медианное значение пикселю
-            output.set(i,j, neighborhood[kernelSize * kernelSize / 2]);
+            int middle = neighborhood.size()/2;
+
+            std::nth_element(neighborhood.begin(),neighborhood.begin()+middle,neighborhood.end());
+
+            output.set(i,j, neighborhood[middle]);
         }
     }
     return output;
+}
+
+void FiltersImage::medianFilterFragment(int kernelSize,Matrix<int> input, Matrix<int> &output,
+                          int startRow, int endRow, int startCol, int endCol) {
+    for (int i = startRow; i < endRow; ++i) {
+        for (int j = startCol; j < endCol; ++j) {
+            std::vector<int> neighborhood;
+
+            int halfFilter = kernelSize/2;
+
+            for (int x = i-halfFilter; x <= i + halfFilter; ++x) {
+                for (int y = j - halfFilter; y <= j + halfFilter; ++y) {
+                    if (x >= 0 && x < input.getHeight() && y >= 0 && y < input.getWidth()) {
+                        neighborhood.push_back(input.get(x,y));
+                    }
+                }
+            }
+
+            int middle = neighborhood.size()/2;
+
+            std::nth_element(neighborhood.begin(),neighborhood.begin()+middle,neighborhood.end());
+
+            output.set(i,j, neighborhood[middle]);
+        }
+    }
 }
 
 Matrix<int> FiltersImage::maximumFilter(int kernelSize, Matrix<int> input){

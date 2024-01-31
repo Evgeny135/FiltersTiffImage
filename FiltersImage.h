@@ -12,7 +12,7 @@ public:
     Matrix<int> mediumFilter(const int kernelSize, Matrix<int> input);
 
     Matrix<int> maximumFilter(int kernelSize, Matrix<int> input);
-
+    static void medianFilterFragment(int kernelSize,Matrix<int> input, Matrix<int> &output, int startRow, int endRow, int startCol, int endCol);
     Matrix<int> minimumFilter(int kernelSize, Matrix<int> input);
 };
 
